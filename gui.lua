@@ -9,6 +9,7 @@ local contextActionService = cloneref(game:GetService('ContextActionService'))
 local lplr = playersService.LocalPlayer
 local playerGui = lplr:WaitForChild("PlayerGui")
 
+-- Load saved statuses
 local sprintEnabled = false
 local success, saved = pcall(function()
     return readfile('sprint_status.txt')
@@ -31,14 +32,6 @@ local success3, saved3 = pcall(function()
 end)
 if success3 and saved3 == 'true' then
     hitboxesEnabled = true
-end
-
-local aimbotEnabled = false
-local success4, saved4 = pcall(function()
-    return readfile('aimbot_status.txt')
-end)
-if success4 and saved4 == 'true' then
-    aimbotEnabled = true
 end
 
 
@@ -466,38 +459,6 @@ local function disableHitBoxes()
     table.clear(hitboxesObjects)
 end
 
--- Aimbot functionality
-local oldFireProjectile
-local function enableAimbot()
-    oldFireProjectile = bedwars.ProjectileController.launchProjectileWithValues
-    bedwars.ProjectileController.launchProjectileWithValues = function(self, proj, ...)
-        if aimbotEnabled and proj.projectileType == 'arrow' then
-            local target = nil
-            local closestDist = math.huge
-            for _, ent in entitylib.List do
-                if ent.Targetable and ent.Player then
-                    local dist = (ent.RootPart.Position - entitylib.character.RootPart.Position).Magnitude
-                    if dist < closestDist then
-                        closestDist = dist
-                        target = ent
-                    end
-                end
-            end
-            if target then
-                local direction = (target.RootPart.Position - entitylib.character.RootPart.Position).Unit
-                proj.lookVector = direction
-            end
-        end
-        return oldFireProjectile(self, proj, ...)
-    end
-end
-
-local function disableAimbot()
-    if oldFireProjectile then
-        bedwars.ProjectileController.launchProjectileWithValues = oldFireProjectile
-        oldFireProjectile = nil
-    end
-end
 
 
 -- Apply initial states after bedwars loads
@@ -512,9 +473,6 @@ task.spawn(function()
     end
     if hitboxesEnabled then
         enableHitBoxes()
-    end
-    if aimbotEnabled then
-        enableAimbot()
     end
 end)
 
@@ -605,16 +563,6 @@ airjumpLabel.Font = Enum.Font.SourceSansBold
 airjumpLabel.TextSize = 18
 airjumpLabel.Parent = airjumpFrame
 
--- Aimbot Button
-local aimbotButton = Instance.new("TextButton")
-aimbotButton.Size = UDim2.new(0, 140, 0, 40)
-aimbotButton.Position = UDim2.new(0, 10, 0, 210)
-aimbotButton.Text = "Aimbot: OFF"
-aimbotButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-aimbotButton.TextColor3 = Color3.new(1, 1, 1)
-aimbotButton.Font = Enum.Font.SourceSansBold
-aimbotButton.TextSize = 18
-aimbotButton.Parent = mainFrame
 
 
 -- Menu Toggle
@@ -643,8 +591,6 @@ task.spawn(function()
         noslowButton.BackgroundColor3 = noslowEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
         hitboxesButton.Text = hitboxesEnabled and "HitBoxes: ON" or "HitBoxes: OFF"
         hitboxesButton.BackgroundColor3 = hitboxesEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-        aimbotButton.Text = aimbotEnabled and "Aimbot: ON" or "Aimbot: OFF"
-        aimbotButton.BackgroundColor3 = aimbotEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
         task.wait(0.1)
     end
 end)
@@ -705,18 +651,7 @@ hitboxesButton.MouseButton1Click:Connect(function()
     end)
 end)
 
-aimbotButton.MouseButton1Click:Connect(function()
-    aimbotEnabled = not aimbotEnabled
-    if aimbotEnabled then
-        enableAimbot()
-    else
-        disableAimbot()
-    end
-    -- Save status
-    pcall(function()
-        writefile('aimbot_status.txt', tostring(aimbotEnabled))
-    end)
-end)
+
 
 
 -- Queue on teleport
@@ -742,10 +677,7 @@ playersService.LocalPlayer.OnTeleport:Connect(function()
             writefile('sprint_status.txt', tostring(sprintEnabled))
             writefile('noslow_status.txt', tostring(noslowEnabled))
             writefile('hitboxes_status.txt', tostring(hitboxesEnabled))
-            writefile('aimbot_status.txt', tostring(aimbotEnabled))
         end)
-        queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/gamepubsite/bedwars/refs/heads/main/gui.lua"))()')
+        queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/gui.lua/main/gui.lua"))()')
     end
 end)
-
-
