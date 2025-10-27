@@ -9,7 +9,6 @@ local contextActionService = cloneref(game:GetService('ContextActionService'))
 local lplr = playersService.LocalPlayer
 local playerGui = lplr:WaitForChild("PlayerGui")
 
--- Load saved statuses
 local sprintEnabled = false
 local success, saved = pcall(function()
     return readfile('sprint_status.txt')
@@ -748,4 +747,5 @@ playersService.LocalPlayer.OnTeleport:Connect(function()
         queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/gamepubsite/bedwars/refs/heads/main/gui.lua"))()')
     end
 end)
+
 
