@@ -745,6 +745,7 @@ playersService.LocalPlayer.OnTeleport:Connect(function()
             writefile('hitboxes_status.txt', tostring(hitboxesEnabled))
             writefile('aimbot_status.txt', tostring(aimbotEnabled))
         end)
-        queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/gui.lua/main/gui.lua"))()')
+        queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/gamepubsite/bedwars/refs/heads/main/gui.lua"))()')
     end
 end)
+
