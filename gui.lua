@@ -42,13 +42,6 @@ if success4 and saved4 == 'true' then
     aimbotEnabled = true
 end
 
-local fastplaceEnabled = false
-local success5, saved5 = pcall(function()
-    return readfile('fastplace_status.txt')
-end)
-if success5 and saved5 == 'true' then
-    fastplaceEnabled = true
-end
 
 -- Bedwars and entitylib setup
 local bedwars, entitylib = {}, {List = {}, Running = false, Events = {}, character = {}, isAlive = false, PlayerConnections = {}, EntityThreads = {}, EntityConnections = {}}
@@ -507,30 +500,6 @@ local function disableAimbot()
     end
 end
 
--- FastPlace functionality
-local oldPlaceBlock
-local function enableFastPlace()
-    if not oldPlaceBlock then
-        oldPlaceBlock = bedwars.BlockController.placeBlock
-        bedwars.BlockController.placeBlock = function(self, pos, blockType, ...)
-            local result = oldPlaceBlock(self, pos, blockType, ...)
-            -- Remove cooldown by immediately allowing next placement
-            task.spawn(function()
-                if bedwars.BlockController.blockPlacer then
-                    bedwars.BlockController.blockPlacer.cooldown = 0
-                end
-            end)
-            return result
-        end
-    end
-end
-
-local function disableFastPlace()
-    if oldPlaceBlock then
-        bedwars.BlockController.placeBlock = oldPlaceBlock
-        oldPlaceBlock = nil
-    end
-end
 
 -- Apply initial states after bedwars loads
 task.spawn(function()
@@ -547,9 +516,6 @@ task.spawn(function()
     end
     if aimbotEnabled then
         enableAimbot()
-    end
-    if fastplaceEnabled then
-        enableFastPlace()
     end
 end)
 
@@ -583,8 +549,8 @@ end)
 
 -- Main Menu Frame
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 160, 0, 350)
-mainFrame.Position = UDim2.new(0.5, -80, 0.5, -175)
+mainFrame.Size = UDim2.new(0, 160, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -80, 0.5, -150)
 mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 mainFrame.BackgroundTransparency = 0.3
 mainFrame.Visible = false
@@ -651,16 +617,6 @@ aimbotButton.Font = Enum.Font.SourceSansBold
 aimbotButton.TextSize = 18
 aimbotButton.Parent = mainFrame
 
--- FastPlace Button
-local fastplaceButton = Instance.new("TextButton")
-fastplaceButton.Size = UDim2.new(0, 140, 0, 40)
-fastplaceButton.Position = UDim2.new(0, 10, 0, 260)
-fastplaceButton.Text = "FastPlace: OFF"
-fastplaceButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-fastplaceButton.TextColor3 = Color3.new(1, 1, 1)
-fastplaceButton.Font = Enum.Font.SourceSansBold
-fastplaceButton.TextSize = 18
-fastplaceButton.Parent = mainFrame
 
 -- Menu Toggle
 local menuVisible = false
@@ -690,8 +646,6 @@ task.spawn(function()
         hitboxesButton.BackgroundColor3 = hitboxesEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
         aimbotButton.Text = aimbotEnabled and "Aimbot: ON" or "Aimbot: OFF"
         aimbotButton.BackgroundColor3 = aimbotEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-        fastplaceButton.Text = fastplaceEnabled and "FastPlace: ON" or "FastPlace: OFF"
-        fastplaceButton.BackgroundColor3 = fastplaceEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
         task.wait(0.1)
     end
 end)
@@ -765,18 +719,6 @@ aimbotButton.MouseButton1Click:Connect(function()
     end)
 end)
 
-fastplaceButton.MouseButton1Click:Connect(function()
-    fastplaceEnabled = not fastplaceEnabled
-    if fastplaceEnabled then
-        enableFastPlace()
-    else
-        disableFastPlace()
-    end
-    -- Save status
-    pcall(function()
-        writefile('fastplace_status.txt', tostring(fastplaceEnabled))
-    end)
-end)
 
 -- Queue on teleport
 local queue_on_teleport = queue_on_teleport or function() end
@@ -802,7 +744,6 @@ playersService.LocalPlayer.OnTeleport:Connect(function()
             writefile('noslow_status.txt', tostring(noslowEnabled))
             writefile('hitboxes_status.txt', tostring(hitboxesEnabled))
             writefile('aimbot_status.txt', tostring(aimbotEnabled))
-            writefile('fastplace_status.txt', tostring(fastplaceEnabled))
         end)
         queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/gui.lua/main/gui.lua"))()')
     end
