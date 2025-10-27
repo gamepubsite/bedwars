@@ -678,6 +678,7 @@ playersService.LocalPlayer.OnTeleport:Connect(function()
             writefile('noslow_status.txt', tostring(noslowEnabled))
             writefile('hitboxes_status.txt', tostring(hitboxesEnabled))
         end)
-        queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/gui.lua/main/gui.lua"))()')
+        queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/gamepubsite/bedwars/refs/heads/main/gui.lua))()')
     end
 end)
+
